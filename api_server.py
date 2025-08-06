@@ -16,9 +16,26 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Add chatbot directory to path for imports
-sys.path.append(str(Path(__file__).parent / "chatbot"))
+chatbot_path = str(Path(__file__).parent / "chatbot")
+sys.path.insert(0, chatbot_path)
 
-from chatbot.main import TemplateChatbot
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+try:
+    from chatbot.main import TemplateChatbot
+    logger.info("Successfully imported TemplateChatbot")
+except ImportError as e:
+    logger.error(f"Failed to import TemplateChatbot: {e}")
+    # Try alternative import
+    try:
+        sys.path.insert(0, str(Path(__file__).parent))
+        from chatbot.main import TemplateChatbot
+        logger.info("Successfully imported TemplateChatbot with alternative path")
+    except ImportError as e2:
+        logger.error(f"Failed alternative import: {e2}")
+        raise
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -133,13 +150,21 @@ async def chat(request: ChatRequest):
         
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
-        error_msg = "I apologize, but I encountered an error while processing your request. Please try again."
+        logger.error(f"Error type: {type(e).__name__}")
+        logger.error(f"Request: {request}")
         
-        # Check for specific error types
-        if "openai" in str(e).lower() or "api" in str(e).lower():
-            error_msg = "I'm currently unable to access my AI capabilities. Please check the API configuration or try again later."
-        elif "rag" in str(e).lower() or "chroma" in str(e).lower():
-            error_msg = "I'm having trouble accessing my knowledge base. The basic chat functionality should still work."
+        # For debugging, include more error details in development
+        debug_mode = os.getenv("DEBUG_MODE", "false").lower() == "true"
+        if debug_mode or os.getenv("ENVIRONMENT") == "development":
+            error_msg = f"Debug - Error: {str(e)} (Type: {type(e).__name__})"
+        else:
+            error_msg = "I apologize, but I encountered an error while processing your request. Please try again."
+            
+            # Check for specific error types
+            if "openai" in str(e).lower() or "api" in str(e).lower():
+                error_msg = "I'm currently unable to access my AI capabilities. Please check the API configuration or try again later."
+            elif "rag" in str(e).lower() or "chroma" in str(e).lower():
+                error_msg = "I'm having trouble accessing my knowledge base. The basic chat functionality should still work."
         
         return ChatResponse(
             response=error_msg,
@@ -262,6 +287,22 @@ async def debug_info():
     try:
         from chatbot.main import TemplateChatbot
         debug_info["imports"] = {"chatbot_main": "SUCCESS"}
+        
+        # Try to initialize a chatbot instance
+        try:
+            chatbot = TemplateChatbot()
+            debug_info["chatbot_init"] = "SUCCESS"
+            
+            # Try a simple chat
+            try:
+                response = await chatbot.chat("Hello")
+                debug_info["chat_test"] = {"status": "SUCCESS", "response_length": len(response)}
+            except Exception as e:
+                debug_info["chat_test"] = {"status": "FAILED", "error": str(e)}
+                
+        except Exception as e:
+            debug_info["chatbot_init"] = f"FAILED: {str(e)}"
+            
     except Exception as e:
         debug_info["imports"] = {"chatbot_main": f"FAILED: {str(e)}"}
     
@@ -270,7 +311,6 @@ async def debug_info():
         if os.getenv("OPENAI_API_KEY"):
             from openai import OpenAI
             client = OpenAI()
-            # Don't actually make a call, just test initialization
             debug_info["openai_client"] = "INITIALIZED"
         else:
             debug_info["openai_client"] = "NO_API_KEY"
