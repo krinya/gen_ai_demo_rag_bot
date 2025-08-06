@@ -232,6 +232,49 @@ async def health_check():
         "environment": os.getenv("ENVIRONMENT", "production")
     }
 
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint to check environment and dependencies"""
+    import sys
+    from pathlib import Path
+    
+    debug_info = {
+        "python_version": sys.version,
+        "working_directory": str(Path.cwd()),
+        "environment_variables": {
+            "OPENAI_API_KEY": "SET" if os.getenv("OPENAI_API_KEY") else "NOT SET",
+            "LANGSMITH_API_KEY": "SET" if os.getenv("LANGSMITH_API_KEY") else "NOT SET",
+            "LANGCHAIN_TRACING_V2": os.getenv("LANGCHAIN_TRACING_V2", "NOT SET"),
+            "LANGCHAIN_PROJECT": os.getenv("LANGCHAIN_PROJECT", "NOT SET"),
+        },
+        "file_system": {
+            "chatbot_dir_exists": Path("chatbot").exists(),
+            "rag_storage_exists": Path("chatbot/rag_storage").exists() if Path("chatbot").exists() else False,
+            "faq_exists": Path("chatbot/faq").exists() if Path("chatbot").exists() else False,
+        }
+    }
+    
+    # Test basic imports
+    try:
+        from chatbot.main import TemplateChatbot
+        debug_info["imports"] = {"chatbot_main": "SUCCESS"}
+    except Exception as e:
+        debug_info["imports"] = {"chatbot_main": f"FAILED: {str(e)}"}
+    
+    # Test OpenAI connection
+    try:
+        if os.getenv("OPENAI_API_KEY"):
+            from openai import OpenAI
+            client = OpenAI()
+            # Don't actually make a call, just test initialization
+            debug_info["openai_client"] = "INITIALIZED"
+        else:
+            debug_info["openai_client"] = "NO_API_KEY"
+    except Exception as e:
+        debug_info["openai_client"] = f"FAILED: {str(e)}"
+    
+    return debug_info
+
 @app.get("/")
 async def root():
     """
