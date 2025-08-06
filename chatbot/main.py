@@ -127,11 +127,29 @@ class TemplateChatbot:
         # Configure LangSmith tracing if available
         langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
         if langsmith_api_key:
-            os.environ["LANGCHAIN_TRACING_V2"] = "true"
-            os.environ["LANGCHAIN_PROJECT"] = self.config.langsmith_project
-            logger.info("LangSmith tracing enabled")
+            try:
+                os.environ["LANGCHAIN_TRACING_V2"] = "true"
+                os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
+                
+                # Use project from .env if available, otherwise use config default
+                langsmith_project = os.getenv("LANGSMITH_PROJECT", self.config.langsmith_project)
+                os.environ["LANGCHAIN_PROJECT"] = langsmith_project
+                
+                # Set endpoint if provided
+                langsmith_endpoint = os.getenv("LANGSMITH_ENDPOINT")
+                if langsmith_endpoint:
+                    os.environ["LANGCHAIN_ENDPOINT"] = langsmith_endpoint
+                
+                logger.info(f"LangSmith tracing enabled for project: {langsmith_project}")
+            except Exception as e:
+                logger.warning(f"Failed to configure LangSmith tracing: {e}")
+                # Disable tracing on configuration error
+                os.environ.pop("LANGCHAIN_TRACING_V2", None)
+                os.environ.pop("LANGCHAIN_API_KEY", None)
         else:
             logger.warning("LANGSMITH_API_KEY not found - tracing disabled")
+            # Ensure tracing is disabled
+            os.environ.pop("LANGCHAIN_TRACING_V2", None)
     
     def _initialize_llm(self):
         """Initialize the OpenAI language model"""

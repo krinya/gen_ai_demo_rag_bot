@@ -12,17 +12,40 @@
   "root": {
     "status": "success",
     "response": {
-      "message": "LangGraph Chatbot API",
-      "docs": "/docs",
-      "health": "/health",
-      "version": "1.0.0"
+      "message": "\ud83e\udd16 LangGraph Chatbot API",
+      "description": "Advanced AI chatbot with smart routing, RAG capabilities, and conversation memory",
+      "version": "1.0.0",
+      "features": [
+        "Smart question routing (FAQ/RAG/LLM)",
+        "ChromaDB vector search",
+        "Conversation memory",
+        "Self-evaluation and improvement",
+        "LangSmith tracing"
+      ],
+      "endpoints": {
+        "chat": "/chat - Send messages to the chatbot",
+        "sessions": "/sessions - Manage chat sessions",
+        "docs": "/docs - Interactive API documentation",
+        "health": "/health - Service health check"
+      },
+      "quick_start": {
+        "1": "POST /sessions - Create a new session",
+        "2": "POST /chat with your session_id - Start chatting",
+        "3": "GET /sessions/{id}/history - View conversation"
+      },
+      "example_questions": [
+        "Who is the CEO of Tesla?",
+        "What are Tesla's 2024 financial highlights?",
+        "How does machine learning work?",
+        "What can you help me with?"
+      ]
     },
     "status_code": 200
   },
   "session_creation": {
     "status": "success",
     "response": {
-      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32",
+      "session_id": "761e7548-fe5b-4086-ad14-4d8e33d44d2b",
       "message": "New session created successfully"
     },
     "status_code": 200
@@ -31,7 +54,7 @@
     "status": "success",
     "response": {
       "response": "I apologize, but I encountered an error while processing your request. Please try again.",
-      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32"
+      "session_id": "761e7548-fe5b-4086-ad14-4d8e33d44d2b"
     },
     "status_code": 200
   },
@@ -39,19 +62,42 @@
     "status": "success",
     "response": {
       "response": "I apologize, but I encountered an error while processing your request. Please try again.",
-      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32"
+      "session_id": "761e7548-fe5b-4086-ad14-4d8e33d44d2b"
     },
     "status_code": 200
   },
   "demo": {
-    "status": "failed",
-    "response": "{\"detail\":\"Not Found\"}",
-    "status_code": 404
+    "status": "success",
+    "response": {
+      "session_id": "be2f1ef2-10c9-4b09-ad2f-5b89c5acee1c",
+      "demo_results": [
+        {
+          "question_type": "FAQ",
+          "question": "Who is the CEO of Tesla?",
+          "response": "I apologize, but I encountered an error while processing your request. Please try again.",
+          "status": "success"
+        },
+        {
+          "question_type": "RAG",
+          "question": "What are Tesla's key financial metrics for 2024?",
+          "response": "I apologize, but I encountered an error while processing your request. Please try again.",
+          "status": "success"
+        },
+        {
+          "question_type": "LLM",
+          "question": "Explain how electric vehicles work",
+          "response": "I apologize, but I encountered an error while processing your request. Please try again.",
+          "status": "success"
+        }
+      ],
+      "note": "These examples show how the chatbot routes different types of questions to appropriate knowledge sources."
+    },
+    "status_code": 200
   },
   "history": {
     "status": "success",
     "response": {
-      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32",
+      "session_id": "761e7548-fe5b-4086-ad14-4d8e33d44d2b",
       "history": [
         {
           "type": "human",
