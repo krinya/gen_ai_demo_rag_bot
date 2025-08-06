@@ -10,6 +10,10 @@ import sys
 from pathlib import Path
 import asyncio
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Add chatbot directory to path for imports
 sys.path.append(str(Path(__file__).parent / "chatbot"))

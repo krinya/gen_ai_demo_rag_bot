@@ -33,16 +33,31 @@ The bot remembers your conversation, grades its own answers, and retries if need
 # Check if API is running
 curl https://gen-ai-demo-rag-bot.onrender.com/health
 
+# Get API overview and features
+curl https://gen-ai-demo-rag-bot.onrender.com/
+
 # Create a new chat session
 curl -X POST https://gen-ai-demo-rag-bot.onrender.com/sessions
 
-# Send a message
+# Send a message (replace SESSION_ID with actual session ID)
 curl -X POST https://gen-ai-demo-rag-bot.onrender.com/chat \
   -H "Content-Type: application/json" \
-  -d '{"message": "Who is the CEO of Tesla?"}'
+  -d '{"message": "Who is the CEO of Tesla?", "session_id": "YOUR_SESSION_ID"}'
+
+# Get conversation history
+curl https://gen-ai-demo-rag-bot.onrender.com/sessions/YOUR_SESSION_ID/history
 ```
 
-> **Note**: The chat functionality requires proper OpenAI API key configuration. If you encounter errors, verify the `OPENAI_API_KEY` environment variable is set in the Render dashboard.
+### Interactive API Testing
+Visit the **Swagger UI** for interactive testing: https://gen-ai-demo-rag-bot.onrender.com/docs
+
+The interactive documentation allows you to:
+- ✅ Test all endpoints directly in your browser
+- ✅ See detailed request/response examples
+- ✅ Try different question types and see routing in action
+- ✅ View comprehensive API documentation
+
+> **Note**: The chat functionality requires proper OpenAI API key configuration. The API infrastructure (sessions, health checks, documentation) is fully functional.
 
 ## Quick Start
 
@@ -116,6 +131,23 @@ response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat",
 
 print(response.json()["response"])
 ```
+
+### Automated Testing
+Run comprehensive API tests:
+```bash
+# Test the deployed API
+uv run python test_api_comprehensive.py
+
+# Test a different endpoint
+uv run python test_api_comprehensive.py http://localhost:8000
+```
+
+The test script validates:
+- ✅ Health and infrastructure endpoints
+- ✅ Session management
+- ✅ Chat functionality across different question types
+- ✅ Conversation history tracking
+- ✅ Error handling and response formats
 
 ## 📁 Project Structure
 
