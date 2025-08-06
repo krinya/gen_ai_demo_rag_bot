@@ -23,12 +23,19 @@ sys.path.insert(0, chatbot_path)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Optionally disable LangSmith tracing in production to avoid 403 errors
+# Temporarily disable LangSmith tracing on Render to troubleshoot
+# This can be controlled via environment variable
 if os.getenv("DISABLE_LANGSMITH_TRACING", "false").lower() == "true":
     os.environ.pop("LANGCHAIN_TRACING_V2", None)
     os.environ.pop("LANGCHAIN_API_KEY", None)
     os.environ.pop("LANGSMITH_API_KEY", None)
     logger.info("LangSmith tracing disabled via DISABLE_LANGSMITH_TRACING")
+else:
+    # For production deployment, disable LangSmith temporarily to avoid potential issues
+    if os.getenv("RENDER", "false").lower() == "true" or "onrender.com" in os.getenv("RENDER_EXTERNAL_URL", ""):
+        os.environ.pop("LANGCHAIN_TRACING_V2", None)
+        os.environ.pop("LANGCHAIN_API_KEY", None)
+        logger.info("LangSmith tracing disabled for Render deployment")
 
 try:
     from chatbot.main import TemplateChatbot

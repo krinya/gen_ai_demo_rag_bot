@@ -11,6 +11,7 @@ This module implements a sophisticated chatbot using LangGraph StateGraph with:
 import os
 import uuid
 import logging
+import traceback
 from pathlib import Path
 from typing import Dict, List, Any, Optional, TypedDict, Annotated, Literal
 from dotenv import load_dotenv
@@ -581,7 +582,8 @@ class TemplateChatbot:
             
         except Exception as e:
             logger.error(f"Error in chat method: {e}")
-            return "I apologize, but I encountered an error while processing your request. Please try again."
+            logger.error(f"Error traceback: {traceback.format_exc()}")
+            return f"I apologize, but I encountered an error while processing your request: {str(e)}. Please try again."
     
     def get_conversation_history(self) -> List[BaseMessage]:
         """Get the conversation history for the current session"""
