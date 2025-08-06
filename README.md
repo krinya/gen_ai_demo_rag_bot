@@ -21,6 +21,29 @@ The bot remembers your conversation, grades its own answers, and retries if need
 - 📊 **LangSmith integration** for observability
 - 🐳 **Docker support** for easy deployment
 
+## 🌐 Live Demo
+
+**Try the deployed API**: https://gen-ai-demo-rag-bot.onrender.com/
+
+- **API Documentation**: https://gen-ai-demo-rag-bot.onrender.com/docs
+- **Health Check**: https://gen-ai-demo-rag-bot.onrender.com/health
+
+### Test the API
+```bash
+# Check if API is running
+curl https://gen-ai-demo-rag-bot.onrender.com/health
+
+# Create a new chat session
+curl -X POST https://gen-ai-demo-rag-bot.onrender.com/sessions
+
+# Send a message
+curl -X POST https://gen-ai-demo-rag-bot.onrender.com/chat \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Who is the CEO of Tesla?"}'
+```
+
+> **Note**: The chat functionality requires proper OpenAI API key configuration. If you encounter errors, verify the `OPENAI_API_KEY` environment variable is set in the Render dashboard.
+
 ## Quick Start
 
 1. **Install dependencies**
@@ -48,13 +71,75 @@ The bot remembers your conversation, grades its own answers, and retries if need
    uv run uvicorn api_server:app --reload
    ```
 
-## Deployment
+## 🚀 Deployment
 
-Ready to deploy to Render.com with included Docker configuration. See `DEPLOY_RENDER.md` for detailed instructions.
+### Live Production API
+**Deployed on Render**: https://gen-ai-demo-rag-bot.onrender.com/
 
-## Project Structure
+### Deploy Your Own
+Ready to deploy to Render.com with included Docker configuration. 
 
-- `chatbot/` - Core chatbot logic and workflow
-- `api_server.py` - FastAPI wrapper for REST API
-- `rag_input_documents/` - Documents for knowledge base
-- `rag_storage/` - Vector database files
+**Quick Deploy**: 
+1. Fork this repository
+2. Connect to [Render.com](https://render.com)
+3. Set your `OPENAI_API_KEY` environment variable
+4. Deploy!
+
+See detailed instructions in:
+- `DEPLOY_RENDER.md` - Quick deployment guide
+- `RENDER_DEPLOYMENT_TUTORIAL.md` - Comprehensive step-by-step tutorial
+
+## 📡 API Endpoints
+
+### Main Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | API information and links |
+| `/health` | GET | Health check for monitoring |
+| `/docs` | GET | Interactive API documentation |
+| `/chat` | POST | Send message to chatbot |
+| `/sessions` | POST | Create new chat session |
+| `/sessions/{id}/history` | GET | Get conversation history |
+| `/sessions/{id}` | DELETE | Delete chat session |
+
+### Example Usage
+```python
+import requests
+
+# Create a session
+session = requests.post("https://gen-ai-demo-rag-bot.onrender.com/sessions")
+session_id = session.json()["session_id"]
+
+# Chat with the bot
+response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat", 
+    json={"message": "What can you tell me about Tesla?", "session_id": session_id})
+
+print(response.json()["response"])
+```
+
+## 📁 Project Structure
+
+```
+gen_ai_demo_rag_bot/
+├── 📁 chatbot/                    # Core chatbot logic
+│   ├── main.py                    # Main chatbot class
+│   ├── create_graph.py            # LangGraph workflow
+│   ├── runner.py                  # CLI interface
+│   ├── utils.py                   # Utility functions
+│   ├── 📁 prompts/                # Prompt templates
+│   ├── 📁 faq/                    # FAQ knowledge base
+│   ├── 📁 rag_input_documents/    # Source documents for RAG
+│   └── 📁 rag_storage/            # Vector database files
+├── 📁 template_basic/             # Template examples
+│   ├── function_calling_routing_example.py
+│   └── robust_routing_example.py
+├── api_server.py                  # FastAPI REST API
+├── main.py                        # Main entry point
+├── Dockerfile                     # Docker configuration
+├── render.yaml                    # Render deployment config
+├── pyproject.toml                 # Dependencies & config
+└── 📋 Documentation
+    ├── README.md                  # This file
+    ├── DEPLOY_RENDER.md           # Quick deploy guide
+    └── RENDER_DEPLOYMENT_TUTORIAL.md  # Detailed tutorial
+```

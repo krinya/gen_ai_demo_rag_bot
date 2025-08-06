@@ -1,0 +1,70 @@
+{
+  "health": {
+    "status": "success",
+    "response": {
+      "status": "healthy",
+      "service": "langraph-chatbot-api",
+      "version": "1.0.0",
+      "environment": "production"
+    },
+    "status_code": 200
+  },
+  "root": {
+    "status": "success",
+    "response": {
+      "message": "LangGraph Chatbot API",
+      "docs": "/docs",
+      "health": "/health",
+      "version": "1.0.0"
+    },
+    "status_code": 200
+  },
+  "session_creation": {
+    "status": "success",
+    "response": {
+      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32",
+      "message": "New session created successfully"
+    },
+    "status_code": 200
+  },
+  "chat_simple": {
+    "status": "success",
+    "response": {
+      "response": "I apologize, but I encountered an error while processing your request. Please try again.",
+      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32"
+    },
+    "status_code": 200
+  },
+  "chat_tesla": {
+    "status": "success",
+    "response": {
+      "response": "I apologize, but I encountered an error while processing your request. Please try again.",
+      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32"
+    },
+    "status_code": 200
+  },
+  "demo": {
+    "status": "failed",
+    "response": "{\"detail\":\"Not Found\"}",
+    "status_code": 404
+  },
+  "history": {
+    "status": "success",
+    "response": {
+      "session_id": "6d25bc87-6b0a-49ea-bf62-e95c5ac6eb32",
+      "history": [
+        {
+          "type": "human",
+          "content": "Hello! What can you help me with?",
+          "timestamp": null
+        },
+        {
+          "type": "human",
+          "content": "Who is the CEO of Tesla?",
+          "timestamp": null
+        }
+      ]
+    },
+    "status_code": 200
+  }
+}
