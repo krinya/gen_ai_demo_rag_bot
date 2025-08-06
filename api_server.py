@@ -32,7 +32,7 @@ except ImportError as e:
 
 app = FastAPI(
     title="LangGraph Chatbot API",
-    description="Advanced chatbot with routing, RAG, and conversation memory",
+    description="A chatbot demo with routing, RAG, and conversation memory",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
