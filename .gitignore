@@ -1,0 +1,47 @@
+.env
+# Always ignore Python cache files
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+# SQLite and DB files
+*.db
+*.sqlite
+# Output files
+outputs/*.txt
+outputs/*.json
+# Log files
+*.log
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Virtual environments
+.venv/
+venv/
+# MacOS system files
+.AppleDouble
+.LSOverride
+# Test and coverage outputs
+htmlcov/
+.coverage
+.mypy_cache/
+.pytest_cache/
+coverage.xml
+# Misc
+*.egg-info/
+dist/
+build/
+
+template_basic/rag_input_documents/csv/*
+template_basic/rag_input_documents/markdown/*
+template_basic/rag_input_documents/pdf/*
+
+template_basic/rag_storage/*
+
+.github/copilot-instructions.md
+.github/settings.json
