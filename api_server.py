@@ -23,37 +23,12 @@ sys.path.insert(0, chatbot_path)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Temporarily disable LangSmith tracing on Render to troubleshoot
-# This can be controlled via environment variable
-if os.getenv("DISABLE_LANGSMITH_TRACING", "false").lower() == "true":
-    os.environ.pop("LANGCHAIN_TRACING_V2", None)
-    os.environ.pop("LANGCHAIN_API_KEY", None)
-    os.environ.pop("LANGSMITH_API_KEY", None)
-    logger.info("LangSmith tracing disabled via DISABLE_LANGSMITH_TRACING")
-else:
-    # For production deployment, disable LangSmith temporarily to avoid potential issues
-    if os.getenv("RENDER", "false").lower() == "true" or "onrender.com" in os.getenv("RENDER_EXTERNAL_URL", ""):
-        os.environ.pop("LANGCHAIN_TRACING_V2", None)
-        os.environ.pop("LANGCHAIN_API_KEY", None)
-        logger.info("LangSmith tracing disabled for Render deployment")
-
 try:
     from chatbot.main import TemplateChatbot
     logger.info("Successfully imported TemplateChatbot")
 except ImportError as e:
     logger.error(f"Failed to import TemplateChatbot: {e}")
-    # Try alternative import
-    try:
-        sys.path.insert(0, str(Path(__file__).parent))
-        from chatbot.main import TemplateChatbot
-        logger.info("Successfully imported TemplateChatbot with alternative path")
-    except ImportError as e2:
-        logger.error(f"Failed alternative import: {e2}")
-        raise
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+    raise
 
 app = FastAPI(
     title="LangGraph Chatbot API",
@@ -164,24 +139,9 @@ async def chat(request: ChatRequest):
         
     except Exception as e:
         logger.error(f"Error in chat endpoint: {str(e)}")
-        logger.error(f"Error type: {type(e).__name__}")
-        logger.error(f"Request: {request}")
-        
-        # For debugging, include more error details in development
-        debug_mode = os.getenv("DEBUG_MODE", "true").lower() == "true"  # Enable debug by default for now
-        if debug_mode or os.getenv("ENVIRONMENT") == "development":
-            error_msg = f"Debug - Error: {str(e)} (Type: {type(e).__name__})"
-        else:
-            error_msg = "I apologize, but I encountered an error while processing your request. Please try again."
-            
-            # Check for specific error types
-            if "openai" in str(e).lower() or "api" in str(e).lower():
-                error_msg = "I'm currently unable to access my AI capabilities. Please check the API configuration or try again later."
-            elif "rag" in str(e).lower() or "chroma" in str(e).lower():
-                error_msg = "I'm having trouble accessing my knowledge base. The basic chat functionality should still work."
         
         return ChatResponse(
-            response=error_msg,
+            response="I apologize, but I encountered an error while processing your request. Please try again.",
             session_id=request.session_id or str(uuid.uuid4())
         )
 
@@ -274,89 +234,6 @@ async def health_check():
         "version": "1.0.0",
         "environment": os.getenv("ENVIRONMENT", "production")
     }
-
-@app.get("/debug")
-async def debug_info():
-    """Debug endpoint to check environment and dependencies"""
-    import sys
-    from pathlib import Path
-    
-    debug_info = {
-        "python_version": sys.version,
-        "working_directory": str(Path.cwd()),
-        "environment_variables": {
-            "OPENAI_API_KEY": "SET" if os.getenv("OPENAI_API_KEY") else "NOT SET",
-            "LANGSMITH_API_KEY": "SET" if os.getenv("LANGSMITH_API_KEY") else "NOT SET",
-            "LANGCHAIN_TRACING_V2": os.getenv("LANGCHAIN_TRACING_V2", "NOT SET"),
-            "LANGCHAIN_PROJECT": os.getenv("LANGCHAIN_PROJECT", "NOT SET"),
-        },
-        "file_system": {
-            "chatbot_dir_exists": Path("chatbot").exists(),
-            "rag_storage_exists": Path("chatbot/rag_storage").exists() if Path("chatbot").exists() else False,
-            "faq_exists": Path("chatbot/faq").exists() if Path("chatbot").exists() else False,
-        }
-    }
-    
-    # Test basic imports
-    try:
-        from chatbot.main import TemplateChatbot
-        debug_info["imports"] = {"chatbot_main": "SUCCESS"}
-        
-        # Try to initialize a chatbot instance
-        try:
-            chatbot = TemplateChatbot()
-            debug_info["chatbot_init"] = "SUCCESS"
-            
-            # Try a simple chat
-            try:
-                response = await chatbot.chat("Hello")
-                debug_info["chat_test"] = {"status": "SUCCESS", "response_length": len(response)}
-            except Exception as e:
-                debug_info["chat_test"] = {"status": "FAILED", "error": str(e)}
-                
-        except Exception as e:
-            debug_info["chatbot_init"] = f"FAILED: {str(e)}"
-            
-    except Exception as e:
-        debug_info["imports"] = {"chatbot_main": f"FAILED: {str(e)}"}
-    
-    # Test OpenAI connection
-    try:
-        if os.getenv("OPENAI_API_KEY"):
-            from openai import OpenAI
-            client = OpenAI()
-            debug_info["openai_client"] = "INITIALIZED"
-        else:
-            debug_info["openai_client"] = "NO_API_KEY"
-    except Exception as e:
-        debug_info["openai_client"] = f"FAILED: {str(e)}"
-    
-    return debug_info
-
-@app.post("/test-chat")
-async def test_chat_direct():
-    """Test chat functionality directly without session management"""
-    try:
-        # Create chatbot directly
-        from chatbot.main import TemplateChatbot
-        chatbot = TemplateChatbot()
-        
-        # Test simple chat
-        response = await chatbot.chat("Hello, how are you?")
-        
-        return {
-            "status": "success",
-            "response": response,
-            "message": "Direct chatbot test successful"
-        }
-    except Exception as e:
-        logger.error(f"Direct chat test failed: {str(e)}")
-        return {
-            "status": "error",
-            "error": str(e),
-            "error_type": type(e).__name__,
-            "message": "Direct chatbot test failed"
-        }
 
 @app.get("/")
 async def root():

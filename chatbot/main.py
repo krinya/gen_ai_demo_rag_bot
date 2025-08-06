@@ -11,7 +11,6 @@ This module implements a sophisticated chatbot using LangGraph StateGraph with:
 import os
 import uuid
 import logging
-import traceback
 from pathlib import Path
 from typing import Dict, List, Any, Optional, TypedDict, Annotated, Literal
 from dotenv import load_dotenv
@@ -128,29 +127,21 @@ class TemplateChatbot:
         # Configure LangSmith tracing if available
         langsmith_api_key = os.getenv("LANGSMITH_API_KEY")
         if langsmith_api_key:
-            try:
-                os.environ["LANGCHAIN_TRACING_V2"] = "true"
-                os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
-                
-                # Use project from .env if available, otherwise use config default
-                langsmith_project = os.getenv("LANGSMITH_PROJECT", self.config.langsmith_project)
-                os.environ["LANGCHAIN_PROJECT"] = langsmith_project
-                
-                # Set endpoint if provided
-                langsmith_endpoint = os.getenv("LANGSMITH_ENDPOINT")
-                if langsmith_endpoint:
-                    os.environ["LANGCHAIN_ENDPOINT"] = langsmith_endpoint
-                
-                logger.info(f"LangSmith tracing enabled for project: {langsmith_project}")
-            except Exception as e:
-                logger.warning(f"Failed to configure LangSmith tracing: {e}")
-                # Disable tracing on configuration error
-                os.environ.pop("LANGCHAIN_TRACING_V2", None)
-                os.environ.pop("LANGCHAIN_API_KEY", None)
+            os.environ["LANGCHAIN_TRACING_V2"] = "true"
+            os.environ["LANGCHAIN_API_KEY"] = langsmith_api_key
+            
+            # Use project from .env if available, otherwise use config default
+            langsmith_project = os.getenv("LANGSMITH_PROJECT", self.config.langsmith_project)
+            os.environ["LANGCHAIN_PROJECT"] = langsmith_project
+            
+            # Set endpoint if provided
+            langsmith_endpoint = os.getenv("LANGSMITH_ENDPOINT")
+            if langsmith_endpoint:
+                os.environ["LANGCHAIN_ENDPOINT"] = langsmith_endpoint
+            
+            logger.info(f"LangSmith tracing enabled for project: {langsmith_project}")
         else:
             logger.warning("LANGSMITH_API_KEY not found - tracing disabled")
-            # Ensure tracing is disabled
-            os.environ.pop("LANGCHAIN_TRACING_V2", None)
     
     def _initialize_llm(self):
         """Initialize the OpenAI language model"""
@@ -582,8 +573,7 @@ class TemplateChatbot:
             
         except Exception as e:
             logger.error(f"Error in chat method: {e}")
-            logger.error(f"Error traceback: {traceback.format_exc()}")
-            return f"I apologize, but I encountered an error while processing your request: {str(e)}. Please try again."
+            return "I apologize, but I encountered an error while processing your request. Please try again."
     
     def get_conversation_history(self) -> List[BaseMessage]:
         """Get the conversation history for the current session"""
