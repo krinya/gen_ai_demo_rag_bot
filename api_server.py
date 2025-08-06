@@ -154,7 +154,7 @@ async def chat(request: ChatRequest):
         logger.error(f"Request: {request}")
         
         # For debugging, include more error details in development
-        debug_mode = os.getenv("DEBUG_MODE", "false").lower() == "true"
+        debug_mode = os.getenv("DEBUG_MODE", "true").lower() == "true"  # Enable debug by default for now
         if debug_mode or os.getenv("ENVIRONMENT") == "development":
             error_msg = f"Debug - Error: {str(e)} (Type: {type(e).__name__})"
         else:
@@ -318,6 +318,31 @@ async def debug_info():
         debug_info["openai_client"] = f"FAILED: {str(e)}"
     
     return debug_info
+
+@app.post("/test-chat")
+async def test_chat_direct():
+    """Test chat functionality directly without session management"""
+    try:
+        # Create chatbot directly
+        from chatbot.main import TemplateChatbot
+        chatbot = TemplateChatbot()
+        
+        # Test simple chat
+        response = await chatbot.chat("Hello, how are you?")
+        
+        return {
+            "status": "success",
+            "response": response,
+            "message": "Direct chatbot test successful"
+        }
+    except Exception as e:
+        logger.error(f"Direct chat test failed: {str(e)}")
+        return {
+            "status": "error",
+            "error": str(e),
+            "error_type": type(e).__name__,
+            "message": "Direct chatbot test failed"
+        }
 
 @app.get("/")
 async def root():
