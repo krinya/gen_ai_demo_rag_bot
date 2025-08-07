@@ -151,7 +151,7 @@ async def test_endpoint():
                     "What is Tesla's main business?",
                     "Who founded Apple?"
                 ],
-                "curl_command": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'"
+                "curl_command": "curl -X POST 'http://localhost:0/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'"
             },
             "rag_routing": {
                 "description": "Test RAG routing with specific data queries",
@@ -160,7 +160,7 @@ async def test_endpoint():
                     "What was Tesla's net income last year?",
                     "Show me Intel's financial performance"
                 ],
-                "curl_command": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'"
+                "curl_command": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'"
             },
             "llm_routing": {
                 "description": "Test LLM routing with general knowledge questions",
@@ -169,7 +169,7 @@ async def test_endpoint():
                     "Explain quantum computing",
                     "What is the difference between AI and ML?"
                 ],
-                "curl_command": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"How does machine learning work?\"}'"
+                "curl_command": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"How does machine learning work?\"}'"
             }
         },
         "expected_metadata": {
@@ -214,9 +214,9 @@ async def root():
         },
         
         "quick_test": {
-            "faq_test": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'",
-            "rag_test": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'",
-            "llm_test": "curl -X POST 'http://localhost:8003/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Explain machine learning\"}'"
+            "faq_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'",
+            "rag_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'",
+            "llm_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Explain machine learning\"}'"
         }
     }
 
