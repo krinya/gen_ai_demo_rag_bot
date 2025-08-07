@@ -1,4 +1,4 @@
-# Dockerfile optimized for Render deployment
+# Dockerfile for LangChain CLI chatbot - Render optimized
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -13,9 +13,12 @@ RUN apt-get update && apt-get install -y \
 # Install UV package manager
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
-# Copy project files
-COPY pyproject.toml uv.lock ./
-COPY . .
+# Copy project configuration and README (required by pyproject.toml)
+COPY pyproject.toml uv.lock README.md ./
+
+# Copy application code (new clean structure)
+COPY app/ ./app/
+COPY packages/ ./packages/
 
 # Install dependencies with UV
 RUN uv sync --frozen
@@ -26,11 +29,11 @@ RUN chown -R app_user:app_user /app
 USER app_user
 
 # Expose port (Render automatically assigns PORT environment variable)
-EXPOSE $PORT
+EXPOSE 8000
 
-# Health check
+# Health check for new server structure
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:$PORT/health || exit 1
+  CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
 
-# Run the API server with Render's PORT environment variable
-CMD ["sh", "-c", "uv run uvicorn api_server:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run the new FastAPI server
+CMD ["sh", "-c", "uv run python -m uvicorn app.server:app --host 0.0.0.0 --port ${PORT:-8000}"]
