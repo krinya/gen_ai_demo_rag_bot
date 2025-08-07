@@ -26,7 +26,7 @@ if __name__ == "__main__":
     print("   • 'Who is the CEO of Tesla?' (FAQ routing)")
     print("   • 'What was Apple's revenue in 2024?' (RAG routing)")
     print("   • 'How does machine learning work?' (LLM routing)")
-    print("\n⚡ Press Ctrl+C to stop")
+    print("\n Press Ctrl+C to stop")
     
     try:
         interface.launch(

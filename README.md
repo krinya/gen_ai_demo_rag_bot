@@ -101,11 +101,14 @@ gen_ai_demo_rag_bot/
 ```python
 import requests
 
-# Create session from you app and chat
-session_id = "your uuid from response"
+# Create your session uuid from your app
+session_id = "your session uuid"
 
-response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat", 
-    json={"message": "What can you tell me about Tesla?", "session_id": session_id})
+response = requests.post(
+   "https://gen-ai-demo-rag-bot.onrender.com/chat",
+   json={"message": "What can you tell me about Tesla?",
+   "session_id": session_id}
+)
 
 print(response.json()["response"])
 ```

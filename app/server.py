@@ -28,9 +28,10 @@ except ImportError as e:
 app = FastAPI(
     title="🤖 Chatbot with inteligent routing (FAQ/ RAG / LLM) - Demo API",
     description=f"""
-    AI Chatbot with Intelligent Routing
+    AI Demo Chatbot with Intelligent Routing
     
-    This API provides a chatbot that automatically routes questions to the most appropriate source:
+    This API provides a chatbot that automatically routes questions to the most appropriate source:  
+    The use can ask questioos about 5 companies (Tesla, Apple, Google, Amazon, Intel) and the chatbot will decide whether to use:
     
     - FAQ: Simple factual questions (CEO names, company info)
     - RAG: Specific data queries (financial data, detailed company information)  
@@ -176,9 +177,9 @@ async def chat_endpoint(request: ChatInput):
     Send a message to the AI chatbot and get an intelligent response with routing metadata.
     
     ### 🎯 Routing Logic:
-    - **FAQ**: Simple factual questions → `"Who is the CEO of Tesla?"`
-    - **RAG**: Specific data queries → `"What was Apple's revenue in 2024?"`  
-    - **LLM**: General knowledge → `"How does machine learning work?"`
+    - **FAQ**: Simple high level factual questions. E.g. `"Who is the CEO of Tesla?"`
+    - **RAG**: Specific data queries related to financial reports. e.g. `"What was Apple's revenue in 2024?"`  
+    - **LLM**: General knowledge. E.g.`"How does machine learning work?"`
     
     ### 📋 Try These Examples:
     
@@ -298,20 +299,14 @@ async def get_examples():
 
 @app.get("/health", tags=["🔧 System"])
 async def health_check():
-    """## ❤️ Health Check
+    """## Health Check
     
     Verify that the chatbot service is running properly."""
     return {
         "status": "healthy",
-        "service": "langchain-chatbot-rag-demo",
+        "service": "gen-ai-rag-bot-demo",
         "version": "2.0.0", 
-        "active_sessions": len(chatbot_sessions),
-        "features": [
-            "✅ Interactive documentation",
-            "✅ Enhanced routing metadata", 
-            "✅ Input validation",
-            "✅ Ready-to-test examples"
-        ]
+        "active_sessions": len(chatbot_sessions)
     }
 
 @app.get("/", tags=["📚 Documentation"])
@@ -325,8 +320,8 @@ async def root():
     3. **Check `/examples`** - Get ready-to-test examples
     4. **Monitor with `/health`** - System status
     
-    ### 🎯 How It Works:
-    The chatbot intelligently routes your questions to the best source:
+    ### How It Works:
+    The chatbot intelligently routes your financial questions about 5 companies to the best source:
     - **FAQ** for simple facts
     - **RAG** for specific data 
     - **LLM** for explanations
@@ -347,11 +342,11 @@ async def root():
             "llm": "General knowledge (How does ML work?)"
         },
         "features": [
-            "🔄 Automatic intelligent routing",
-            "📊 Detailed response metadata",
-            "💬 Session-based conversations", 
-            "🚀 Interactive documentation",
-            "✅ Input validation & error handling"
+            "Automatic intelligent routing",
+            "Detailed response metadata",
+            "Session-based conversations", 
+            "Interactive documentation",
+            "Input validation & error handling"
         ]
     }
 

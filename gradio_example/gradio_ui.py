@@ -18,8 +18,8 @@ HEALTH_ENDPOINT = f"{API_BASE_URL}/health"
 # Pre-populated example queries by routing type (one per type)
 EXAMPLE_QUERIES = {
     "FAQ": "Who is the CEO of Tesla?",
-    "RAG": "What was Apple's revenue in 2024?",
-    "LLM": "How does machine learning work?"
+    "RAG": "What was Apple's revenue in 2024?", 
+    "LLM": "How do you calculate price-to-earnings ratio?"
 }
 
 # Color schemes for different routing types
@@ -53,7 +53,7 @@ def send_message_to_api(message: str, session_id: str) -> Dict:
             CHAT_ENDPOINT,
             json=payload,
             headers={"Content-Type": "application/json"},
-            timeout=30
+            timeout=150
         )
         
         if response.status_code == 200:
@@ -122,7 +122,7 @@ def format_chat_message(message: str, is_user: bool, routing_info: Optional[Dict
         
         return f"**🤖 Assistant{route_indicator}** *({timestamp})*\n{message}"
 
-def chat_with_bot(message: str, history: List[List[str]], session_id: str, show_routing: bool) -> Tuple[List[List[str]], str, str, str]:
+def chat_with_bot(message: str, history: List[Dict[str, str]], session_id: str, show_routing: bool) -> Tuple[List[Dict[str, str]], str, str, str]:
     """Main chat function"""
     if not message.strip():
         return history, "", "", session_id
@@ -140,8 +140,9 @@ def chat_with_bot(message: str, history: List[List[str]], session_id: str, show_
     if show_routing and routing_info:
         routing_display = format_routing_info(routing_info)
     
-    # Add to chat history
-    history.append([message, bot_response])
+    # Add to chat history using messages format
+    history.append({"role": "user", "content": message})
+    history.append({"role": "assistant", "content": bot_response})
     
     return history, "", routing_display, session_id
 
@@ -181,17 +182,32 @@ def create_gradio_interface():
             font-size: 0.9em;
             margin: 8px 0;
         }
+        .footer-info {
+            color: #6c757d;
+            font-size: 0.9em;
+            text-align: center;
+            margin-top: 20px;
+        }
         """
     ) as interface:
         
         # Header
         gr.Markdown("""
-        # 🤖 AI Chatbot with Smart Routing & RAG
+        # 🤖 Financial AI Chatbot with Smart Routing & RAG
         
-        This chatbot intelligently routes your questions to the best source:
-        - 🔍 **FAQ** for quick facts (CEO names, founding dates)
-        - 📚 **RAG** for specific data (financial info, detailed company data)  
-        - 🧠 **LLM** for explanations and general knowledge
+        **A prototype showcasing advanced AI capabilities for financial Q&A**
+        
+        This intelligent chatbot answers financial questions about **5 major companies** (Apple, Google, Amazon, Tesla, Intel) using smart routing:
+        
+        - 🔍 **FAQ Route**: Quick facts (CEO names, founding dates, basic company info)
+        - 📚 **RAG Route**: Detailed financial data from 2024 annual reports (revenue, profits, growth metrics)
+        - 🧠 **LLM Route**: General explanations and complex financial concepts
+        
+        **🏗️ Architecture**: Built with LangChain, OpenAI GPT-4o-mini, ChromaDB vector storage, and deployed on Render.
+        
+        **📊 View the workflow**: [Architecture Diagram](https://github.com/krinya/gen_ai_demo_rag_bot/blob/main/packages/chatbot/chatbot_workflow_graph.png) | **💻 Source Code**: [GitHub Repository](https://github.com/krinya/gen_ai_demo_rag_bot/tree/main)
+        
+        ---
         """)
         
         # API Health Status
@@ -209,13 +225,13 @@ def create_gradio_interface():
             label="Chat History",
             height=500,
             show_label=True,
-            type="tuples"
+            type="messages"
         )
         
         with gr.Row():
             msg_input = gr.Textbox(
-                placeholder="Ask me anything! Try the examples below.",
-                label="Your Message",
+                placeholder="Ask about Apple, Google, Amazon, Tesla, or Intel financials...",
+                label="Your Financial Question",
                 scale=4,
                 lines=1
             )
@@ -258,6 +274,15 @@ def create_gradio_interface():
             elem_classes=["routing-info"]
         )
         
+        # Footer with deployment info
+        gr.Markdown("""
+        ---
+        **🚀 Deployment Info**: This prototype is powered by a FastAPI backend deployed on [Render](https://render.com), 
+        showcasing full-stack AI development skills with production-ready architecture.
+        
+        **🛠️ Tech Stack**: LangChain • OpenAI GPT-4o-mini • ChromaDB • FastAPI • Render Cloud • Gradio
+        """, elem_classes=["footer-info"])
+        
         # Event handlers
         def clear_chat():
             return [], ""
@@ -281,7 +306,10 @@ def create_gradio_interface():
             # Show loading message
             if message.strip():
                 # Add user message and loading response immediately
-                loading_history = history + [[message, "🤔 Thinking..."]]
+                loading_history = history + [
+                    {"role": "user", "content": message},
+                    {"role": "assistant", "content": "🤔 Thinking..."}
+                ]
                 yield loading_history, "", "🔄 Processing your message...", session_id
                 
                 # Get actual response
@@ -314,7 +342,7 @@ if __name__ == "__main__":
     # Launch with configuration
     interface.launch(
         server_name="127.0.0.1",  # Local access only
-        server_port=7860,
+        server_port=7861,  # Changed from 7860 to avoid conflicts
         share=False,  # Set to True if you want a public link
         debug=True,
         show_error=True,
