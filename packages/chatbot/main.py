@@ -103,7 +103,7 @@ class ChatbotState(TypedDict):
     current_source: Literal["faq", "rag", "llm"]  # Track current source
     failed_sources: List[Literal["faq", "rag", "llm"]]  # Track which sources have failed
 
-class TemplateChatbot:
+class MainChatbot:
     """
     Advanced chatbot template using LangGraph for workflow management you can use as a starting point.
     """
@@ -674,9 +674,9 @@ class TemplateChatbot:
         return self.session_id
 
 # Convenience function for external usage
-async def create_chatbot(session_id: Optional[str] = None, config: Optional[ChatbotConfig] = None) -> TemplateChatbot:
+async def create_chatbot(session_id: Optional[str] = None, config: Optional[ChatbotConfig] = None) -> MainChatbot:
     """Create and return a configured chatbot instance"""
-    return TemplateChatbot(session_id=session_id, config=config)
+    return MainChatbot(session_id=session_id, config=config)
 
 if __name__ == "__main__":
     

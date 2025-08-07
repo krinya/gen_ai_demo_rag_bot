@@ -16,7 +16,7 @@ import logging
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from packages.chatbot.main import TemplateChatbot, create_chatbot
+from packages.chatbot.main import MainChatbot, create_chatbot
 from packages.chatbot.utils import (
     print_system_status, 
     generate_session_id
@@ -33,7 +33,7 @@ class ChatbotCLI:
     """Command Line Interface for the Template Chatbot"""
     
     def __init__(self):
-        self.chatbot: Optional[TemplateChatbot] = None
+        self.chatbot: Optional[MainChatbot] = None
         self.session_id: Optional[str] = None
         self.running = True
         
@@ -242,10 +242,9 @@ class ChatbotCLI:
         print("This will test the chatbot with various types of questions.")
         
         demo_questions = [
-            "How much does your service cost?",  # Should route to FAQ
-            "Tell me about Cleango chatbot? Where people can use it?", # Should route to RAG
-            "How does machine learning work?",   # Should route to LLM
-            "Can I cancel my wash and how?", # Should route to FAQ
+            "Who is the CEO of Tesla?",
+            "How much was the net income of Intel in 2024?",
+            "How does machine learning work?"
         ]
         
         for i, question in enumerate(demo_questions, 1):

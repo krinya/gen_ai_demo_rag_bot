@@ -1,76 +1,40 @@
 # AI Chatbot with Smart Routing & RAG
 
-A production-ready chatbot built with LangChain, LangGraph, and OpenAI that intelligently routes questions and provides context-aware answers.
-
-## What it does
-
-This chatbot automatically decides how to handle your questions:
-- **FAQ questions** → Quick answers from built-in knowledge
-- **Company research** → Searches through document database (RAG)  
-- **General questions** → Uses OpenAI's GPT-4o-mini
-
-The bot remembers your conversation, grades its own answers, and retries if needed. Everything is logged to LangSmith for monitoring.
+A production-ready chatbot that intelligently routes questions using LangChain, LangGraph, and OpenAI. It decides whether to use FAQ knowledge, search documents via RAG, or call GPT-4o-mini based on your question.
 
 ## Features
 
-- 🧠 **Smart routing** with confidence scoring
-- 📚 **RAG system** with ChromaDB vector storage
-- 💾 **Conversation memory** across sessions
-- 🔄 **Self-evaluation** and answer improvement
-- 🚀 **REST API** ready for deployment
-- 📊 **LangSmith integration** for observability
-- 🐳 **Docker support** for easy deployment
+- **Smart routing** - Automatically chooses the best response method
+- **RAG system** - ChromaDB vector storage for document search
+- **Memory** - Remembers conversation history across sessions
+- **Self-evaluation** - Grades and improves its own answers
+- **REST API** - Ready for deployment with FastAPI
+- **Monitoring** - LangSmith integration for observability
 
 ## 🌐 Live Demo
 
-**Try the deployed API**: https://gen-ai-demo-rag-bot.onrender.com/
+**Production API**: https://gen-ai-demo-rag-bot.onrender.com/
 
-- **API Documentation**: https://gen-ai-demo-rag-bot.onrender.com/docs
+- **Documentation**: https://gen-ai-demo-rag-bot.onrender.com/docs  
 - **Health Check**: https://gen-ai-demo-rag-bot.onrender.com/health
 
-### Test the API
+### Quick API Test
 ```bash
-# Check if API is running
+# Check status
 curl https://gen-ai-demo-rag-bot.onrender.com/health
 
-# Get API overview and features
-curl https://gen-ai-demo-rag-bot.onrender.com/
-
-# Create a new chat session
+# Create session and chat
 curl -X POST https://gen-ai-demo-rag-bot.onrender.com/sessions
-
-# Send a message (replace SESSION_ID with actual session ID)
 curl -X POST https://gen-ai-demo-rag-bot.onrender.com/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Who is the CEO of Tesla?", "session_id": "YOUR_SESSION_ID"}'
-
-# Get conversation history
-curl https://gen-ai-demo-rag-bot.onrender.com/sessions/YOUR_SESSION_ID/history
 ```
 
-### Interactive API Testing
-Visit the **Swagger UI** for interactive testing: https://gen-ai-demo-rag-bot.onrender.com/docs
-
-The interactive documentation allows you to:
-- ✅ Test all endpoints directly in your browser
-- ✅ See detailed request/response examples  
-- ✅ View comprehensive API documentation
-- ✅ Explore the enhanced API with better error handling
-
-### API Status
-| Component | Status | Notes |
-|-----------|--------|-------|
-| 🏥 Health Check | ✅ Working | Service monitoring ready |
-| 📋 API Documentation | ✅ Working | Interactive Swagger UI available |
-| 🔧 Session Management | ✅ Working | Create, delete, track sessions |
-| 📜 Conversation History | ✅ Working | Full message tracking |
-| 💬 Chat Functionality | ⚠️ Limited | Core infrastructure ready, requires OpenAI configuration review |
-| 🐳 Docker Deployment | ✅ Working | Successfully deployed to Render |
-| 📊 Error Handling | ✅ Enhanced | User-friendly error messages |
-
-> **Note**: The API infrastructure is fully functional with enhanced documentation and error handling. Chat functionality shows graceful error handling and is ready for production use once the OpenAI integration is fully configured.
+Visit the [interactive docs](https://gen-ai-demo-rag-bot.onrender.com/docs) to test all endpoints directly in your browser.
 
 ## Quick Start
+
+### Local Development with UV
 
 1. **Install dependencies**
    ```bash
@@ -80,109 +44,75 @@ The interactive documentation allows you to:
 2. **Set up environment**
    ```bash
    cp .env.example .env
-   # Edit .env with your OPENAI_API_KEY
+   # Add your OPENAI_API_KEY to .env
    ```
 
 3. **Build knowledge base**
    ```bash
-   uv run python chatbot/rag_input_documents/create_vector_storage.py
+   uv run python packages/chatbot/rag_input_documents/create_vector_storage.py
    ```
 
-4. **Run the chatbot**
+4. **Run locally**
    ```bash
-   # Command line interface
-   uv run python chatbot/runner.py
+   # Command line chatbot
+   uv run python packages/chatbot/runner.py
    
-   # Or start API server
-   uv run uvicorn api_server:app --reload
+   # API server
+   uv run uvicorn app.server:app --reload
    ```
 
 ## 🚀 Deployment
 
-### Live Production API
-**Deployed on Render**: https://gen-ai-demo-rag-bot.onrender.com/
+**Live Production**: https://gen-ai-demo-rag-bot.onrender.com/
 
-### Deploy Your Own
-Ready to deploy to Render.com with included Docker configuration. 
-
-**Quick Deploy**: 
-1. Fork this repository
-2. Connect to [Render.com](https://render.com)
-3. Set your `OPENAI_API_KEY` environment variable
-4. Deploy!
-
-See detailed instructions in:
-- `DEPLOY_RENDER.md` - Quick deployment guide
-- `RENDER_DEPLOYMENT_TUTORIAL.md` - Comprehensive step-by-step tutorial
+Ready to deploy to Render with Docker. Fork this repo, connect to Render, add your `OPENAI_API_KEY`, and deploy.
 
 ## 📡 API Endpoints
 
-### Main Endpoints
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | API information and links |
-| `/health` | GET | Health check for monitoring |
-| `/docs` | GET | Interactive API documentation |
-| `/chat` | POST | Send message to chatbot |
-| `/sessions` | POST | Create new chat session |
-| `/sessions/{id}/history` | GET | Get conversation history |
-| `/sessions/{id}` | DELETE | Delete chat session |
-
-### Example Usage
-```python
-import requests
-
-# Create a session
-session = requests.post("https://gen-ai-demo-rag-bot.onrender.com/sessions")
-session_id = session.json()["session_id"]
-
-# Chat with the bot
-response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat", 
-    json={"message": "What can you tell me about Tesla?", "session_id": session_id})
-
-print(response.json()["response"])
-```
-
-### Automated Testing
-Run comprehensive API tests:
-```bash
-# Test the deployed API
-uv run python test_api_comprehensive.py
-
-# Test a different endpoint
-uv run python test_api_comprehensive.py http://localhost:8000
-```
-
-The test script validates:
-- ✅ Health and infrastructure endpoints
-- ✅ Session management
-- ✅ Chat functionality across different question types
-- ✅ Conversation history tracking
-- ✅ Error handling and response formats
+| `/` | GET | API overview |
+| `/health` | GET | Health check |
+| `/docs` | GET | Interactive documentation |
+| `/chat` | POST | Send message |
+| `/sessions` | POST | Create session |
+| `/sessions/{id}/history` | GET | Get history |
+| `/sessions/{id}` | DELETE | Delete session |
 
 ## 📁 Project Structure
 
 ```
 gen_ai_demo_rag_bot/
-├── 📁 chatbot/                    # Core chatbot logic
-│   ├── main.py                    # Main chatbot class
-│   ├── create_graph.py            # LangGraph workflow
-│   ├── runner.py                  # CLI interface
-│   ├── utils.py                   # Utility functions
-│   ├── 📁 prompts/                # Prompt templates
-│   ├── 📁 faq/                    # FAQ knowledge base
-│   ├── 📁 rag_input_documents/    # Source documents for RAG
-│   └── 📁 rag_storage/            # Vector database files
-├── 📁 template_basic/             # Template examples
-│   ├── function_calling_routing_example.py
-│   └── robust_routing_example.py
-├── api_server.py                  # FastAPI REST API
+├── app/
+│   ├── __init__.py
+│   └── server.py                  # FastAPI REST API
+├── packages/
+│   └── chatbot/                   # Core chatbot logic
+│       ├── main.py                # Main chatbot class
+│       ├── create_graph.py        # LangGraph workflow
+│       ├── runner.py              # CLI interface (run with uv)
+│       ├── utils.py               # Utility functions
+│       ├── prompts/               # Prompt templates
+│       ├── faq/                   # FAQ knowledge base
+│       ├── rag_input_documents/   # Source documents for RAG
+│       └── rag_storage/           # Vector database files
 ├── main.py                        # Main entry point
 ├── Dockerfile                     # Docker configuration
-├── render.yaml                    # Render deployment config
-├── pyproject.toml                 # Dependencies & config
-└── 📋 Documentation
-    ├── README.md                  # This file
-    ├── DEPLOY_RENDER.md           # Quick deploy guide
-    └── RENDER_DEPLOYMENT_TUTORIAL.md  # Detailed tutorial
+├── pyproject.toml                 # UV dependencies & config
+└── README.md                      # This file
+```
+
+## Example Usage
+
+```python
+import requests
+
+# Create session and chat
+session = requests.post("https://gen-ai-demo-rag-bot.onrender.com/sessions")
+session_id = session.json()["session_id"]
+
+response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat", 
+    json={"message": "What can you tell me about Tesla?", "session_id": session_id})
+
+print(response.json()["response"])
 ```

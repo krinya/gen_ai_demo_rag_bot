@@ -1,5 +1,5 @@
 """
-Improved LangChain Chatbot Server - Clean version with all enhancements
+LangChain Chatbot Server with Interactive Documentation
 """
 
 from fastapi import FastAPI, HTTPException
@@ -18,52 +18,143 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 try:
-    from packages.chatbot.main import TemplateChatbot, create_chatbot
+    from packages.chatbot.main import MainChatbot, create_chatbot
     logger.info("Successfully imported chatbot components")
 except ImportError as e:
     logger.error(f"Failed to import chatbot: {e}")
     raise
 
-# Create FastAPI app
+# Create FastAPI app with enhanced documentation
 app = FastAPI(
-    title="LangChain Chatbot API - Improved",
-    description="Advanced LangGraph chatbot with routing metadata",
-    version="1.1.0",
+    title="🤖 Chatbot with inteligent routing (FAQ/ RAG / LLM) - Demo API",
+    description=f"""
+    AI Chatbot with Intelligent Routing
+    
+    This API provides a chatbot that automatically routes questions to the most appropriate source:
+    
+    - FAQ: Simple factual questions (CEO names, company info)
+    - RAG: Specific data queries (financial data, detailed company information)  
+    - LLM: General knowledge questions (explanations, how-to guides)
+    
+    Try it out directly in the docs below!
+    
+    Each endpoint includes ready-to-test examples. Just click "Try it out" and modify the examples.
+    """,
+    version="2.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    contact={
+        "name": "API Support",
+        "email": "menyhert.kristof@gmail.com",
+    }
 )
 
 # Session storage
 chatbot_sessions = {}
 MAX_SESSIONS = 100
 
-# === Pydantic Models ===
+# === Enhanced Pydantic Models with Interactive Examples ===
 
 class ChatInput(BaseModel):
-    message: str = Field(..., description="The user's message")
-    session_id: Optional[str] = Field(None, description="Session ID for conversation continuity")
+    """Input model for chat requests with ready-to-test examples"""
+    message: str = Field(
+        ..., 
+        description="Your message to the chatbot",
+        example="Who is the CEO of Tesla?"
+    )
+    session_id: Optional[str] = Field(
+        None, 
+        description="Optional session ID for conversation continuity",
+        example="my-chat-session-123"
+    )
+    
+    class Config:
+        json_schema_extra = {
+            "examples": [
+                {
+                    "message": "Who is the CEO of Tesla?",
+                    "session_id": "test-session-1"
+                },
+                {
+                    "message": "What was Apple's revenue in 2024?",
+                    "session_id": "test-session-2"  
+                },
+                {
+                    "message": "How does machine learning work?"
+                }
+            ]
+        }
 
 class RoutingInfo(BaseModel):
-    primary_route: str = Field(..., description="Initial routing decision")
-    final_source: str = Field(..., description="Final source that provided the answer") 
-    answer_quality: str = Field(..., description="Quality assessment")
-    rephrase_attempts: int = Field(..., description="Number of rephrasing attempts")
-    failed_sources: List[str] = Field(..., description="Sources that failed")
-    question_evolution: Optional[Dict[str, str]] = Field(None, description="Question changes")
+    """Detailed information about how the question was routed and processed"""
+    primary_route: str = Field(
+        ..., 
+        description="Initial routing decision (faq/rag/llm)",
+        example="faq"
+    )
+    final_source: str = Field(
+        ..., 
+        description="Final source that provided the answer",
+        example="faq_handler"
+    ) 
+    answer_quality: str = Field(
+        ..., 
+        description="Quality assessment of the answer",
+        example="good"
+    )
+    rephrase_attempts: int = Field(
+        ..., 
+        description="Number of question rephrasing attempts",
+        example=0
+    )
+    failed_sources: List[str] = Field(
+        ..., 
+        description="Sources that failed before finding the answer",
+        example=[]
+    )
+    question_evolution: Optional[Dict[str, str]] = Field(
+        None, 
+        description="How the question was modified during processing",
+        example={"original": "Who runs Tesla?", "final": "Who is the CEO of Tesla?"}
+    )
 
 class EnhancedMetadata(BaseModel):
-    message_count: int = Field(..., description="Total messages in conversation")
-    routing_info: RoutingInfo = Field(..., description="Detailed routing information")
-    session_active: bool = Field(..., description="Whether session is active")
+    """Comprehensive metadata about the chat session and response"""
+    message_count: int = Field(
+        ..., 
+        description="Total messages in this conversation",
+        example=1
+    )
+    routing_info: RoutingInfo = Field(
+        ..., 
+        description="Detailed routing and processing information"
+    )
+    session_active: bool = Field(
+        ..., 
+        description="Whether the session is currently active",
+        example=True
+    )
 
 class ChatOutput(BaseModel):
-    response: str = Field(..., description="The AI's response")
-    session_id: str = Field(..., description="Session ID")
-    metadata: Optional[EnhancedMetadata] = Field(None, description="Enhanced response metadata")
+    """Complete chat response with metadata"""
+    response: str = Field(
+        ..., 
+        description="The AI chatbot's response to your message",
+        example="Elon Musk is the CEO of Tesla."
+    )
+    session_id: str = Field(
+        ..., 
+        description="Session ID for this conversation",
+        example="test-session-1"
+    )
+    metadata: Optional[EnhancedMetadata] = Field(
+        None, 
+        description="Detailed metadata about routing and processing"
+    )
 
 # === Helper Functions ===
 
-async def get_or_create_chatbot(session_id: str) -> TemplateChatbot:
+async def get_or_create_chatbot(session_id: str) -> MainChatbot:
     if len(chatbot_sessions) >= MAX_SESSIONS:
         oldest_session = next(iter(chatbot_sessions))
         del chatbot_sessions[oldest_session]
@@ -75,35 +166,39 @@ async def get_or_create_chatbot(session_id: str) -> TemplateChatbot:
     
     return chatbot_sessions[session_id]
 
-# === Main Routes ===
+# === Main Chat Endpoint ===
 
-@app.post("/chat", response_model=ChatOutput)
+@app.post("/chat", response_model=ChatOutput, tags=["💬 Chat"])
 async def chat_endpoint(request: ChatInput):
     """
-    Enhanced chat endpoint with real routing metadata.
+    ## 🚀 Main Chat Endpoint
     
-    **How to use:**
-    - POST a JSON payload to `/chat` with your message.
-    - Optionally provide a `session_id` to continue a conversation.
+    Send a message to the AI chatbot and get an intelligent response with routing metadata.
     
-    **Example payloads:**
+    ### 🎯 Routing Logic:
+    - **FAQ**: Simple factual questions → `"Who is the CEO of Tesla?"`
+    - **RAG**: Specific data queries → `"What was Apple's revenue in 2024?"`  
+    - **LLM**: General knowledge → `"How does machine learning work?"`
+    
+    ### 📋 Try These Examples:
+    
+    **FAQ Example:**
     ```json
-    {
-      "message": "Who is the CEO of Tesla?"
-    }
+    {"message": "Who is the CEO of Tesla?"}
     ```
-    ```json
-    {
-      "message": "What was Apple's revenue in 2024?"
-    }
-    ```
-    **Example curl:**
-    curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{"message": "Who is the CEO of Tesla?"}'
     
-    **Routing Logic:**
-    - FAQ: Simple factual questions (e.g., "Who is the CEO of Tesla?")
-    - RAG: Specific data queries (e.g., "What was Apple's revenue in 2024?")
-    - LLM: General knowledge (e.g., "How does machine learning work?")
+    **RAG Example:**
+    ```json
+    {"message": "What was Apple's revenue in 2024?"}
+    ```
+    
+    **LLM Example:**
+    ```json
+    {"message": "Explain quantum computing"}
+    ```
+    
+    ### 🔄 Session Continuity:
+    Include a `session_id` to maintain conversation history across multiple requests.
     """
     try:
         # Input validation
@@ -154,100 +249,110 @@ async def chat_endpoint(request: ChatInput):
         logger.error(f"Error in chat endpoint: {e}")
         raise HTTPException(status_code=500, detail=f"Chat processing error: {str(e)}")
 
-@app.get("/test")
-async def test_endpoint():
+# === Testing and Information Endpoints ===
+
+@app.get("/examples", tags=["📚 Documentation"])
+async def get_examples():
     """
-    Testing guide with examples for different routing scenarios
+    ## 📋 Ready-to-Test Examples
+    
+    Get example messages for each routing type. Copy these examples directly into the `/chat` endpoint above!
     """
     return {
-        "message": "🧪 Chatbot Testing Guide",
-        "routing_tests": {
-            "faq_routing": {
-                "description": "Test FAQ routing with simple factual questions",
-                "example_questions": [
-                    "Who is the CEO of Tesla?",
-                    "What is Tesla's main business?",
-                    "Who founded Apple?"
-                ],
-                "curl_command": "curl -X POST 'http://localhost:0/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'"
+        "message": "🧪 Copy these examples to test different routing types",
+        "examples": {
+            "faq_examples": {
+                "description": "Simple factual questions → Routes to FAQ handler",
+                "try_these": [
+                    {"message": "Who is the CEO of Tesla?"},
+                    {"message": "What is Tesla's main business?"},
+                    {"message": "Who founded Apple?"},
+                    {"message": "What does Google do?"}
+                ]
             },
-            "rag_routing": {
-                "description": "Test RAG routing with specific data queries",
-                "example_questions": [
-                    "What was Apple's revenue in 2024?",
-                    "What was Tesla's net income last year?",
-                    "Show me Intel's financial performance"
-                ],
-                "curl_command": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'"
+            "rag_examples": {
+                "description": "Specific data queries → Routes to RAG system",
+                "try_these": [
+                    {"message": "What was Apple's revenue in 2024?"},
+                    {"message": "Show me Tesla's financial performance"},
+                    {"message": "What was Intel's net income last year?"},
+                    {"message": "Tell me about Amazon's recent earnings"}
+                ]
             },
-            "llm_routing": {
-                "description": "Test LLM routing with general knowledge questions",
-                "example_questions": [
-                    "How does machine learning work?",
-                    "Explain quantum computing",
-                    "What is the difference between AI and ML?"
-                ],
-                "curl_command": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"How does machine learning work?\"}'"
+            "llm_examples": {
+                "description": "General knowledge → Routes to LLM",
+                "try_these": [
+                    {"message": "How does machine learning work?"},
+                    {"message": "Explain quantum computing"},
+                    {"message": "What is the difference between AI and ML?"},
+                    {"message": "How do neural networks learn?"}
+                ]
             }
         },
-        "expected_metadata": {
-            "primary_route": "The initial routing decision (faq/rag/llm)",
-            "final_source": "Actual source that provided the answer",
-            "answer_quality": "Quality assessment (good/bad)",
-            "rephrase_attempts": "Number of question rephrasing attempts"
+        "tips": {
+            "session_continuity": "Add a session_id to maintain conversation history",
+            "metadata": "Check the response metadata to see routing decisions",
+            "testing": "Try borderline questions to see how routing adapts"
         }
     }
 
-@app.get("/health")
+@app.get("/health", tags=["🔧 System"])
 async def health_check():
-    """Health check with improvements indicator"""
+    """## ❤️ Health Check
+    
+    Verify that the chatbot service is running properly."""
     return {
         "status": "healthy",
-        "service": "langchain-chatbot-improved",
-        "version": "1.1.0", 
+        "service": "langchain-chatbot-rag-demo",
+        "version": "2.0.0", 
         "active_sessions": len(chatbot_sessions),
-        "improvements": "✅ Enhanced routing metadata, input validation, testing guides"
+        "features": [
+            "✅ Interactive documentation",
+            "✅ Enhanced routing metadata", 
+            "✅ Input validation",
+            "✅ Ready-to-test examples"
+        ]
     }
 
-@app.get("/")
+@app.get("/", tags=["📚 Documentation"])
 async def root():
-    """Enhanced API overview with instant test examples"""
+    """
+    ## 🚀 Welcome to the LangChain Chatbot API
+    
+    ### Quick Start Guide:
+    1. **Go to `/docs`** - Interactive API documentation
+    2. **Try the `/chat` endpoint** - Send messages to the AI
+    3. **Check `/examples`** - Get ready-to-test examples
+    4. **Monitor with `/health`** - System status
+    
+    ### 🎯 How It Works:
+    The chatbot intelligently routes your questions to the best source:
+    - **FAQ** for simple facts
+    - **RAG** for specific data 
+    - **LLM** for explanations
+    """
     return {
-        "message": "🚀 LangChain Chatbot API v1.1 - Enhanced",
-        "description": "Advanced chatbot with real-time routing metadata",
-        "key_improvements": [
-            "✅ Real routing metadata in responses",
-            "✅ Input validation and error handling", 
-            "✅ Structured response models",
-            "✅ Testing guide with examples",
-            "✅ Enhanced documentation"
-        ],
-        "endpoints": {
-            "chat": "/chat - Main chat with routing metadata",
-            "test": "/test - Testing guide with examples",
-            "health": "/health - Health check with improvements",
-            "docs": "/docs - Complete API documentation"
+        "message": "🤖 LangChain Chatbot API v2.0",
+        "description": "Intelligent AI chatbot with automatic routing",
+        "interactive_docs": "/docs",
+        "quick_start": {
+            "step_1": "Visit /docs for interactive testing",
+            "step_2": "Try the /chat endpoint with example messages",
+            "step_3": "Check /examples for ready-to-test queries",
+            "step_4": "Monitor system health at /health"
         },
-        "quick_test": {
-            "faq_test": {
-                "description": "Ask a simple factual question",
-                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'",
-                "example_payload": {"message": "Who is the CEO of Tesla?"},
-                "expected_response": "Elon Musk is the CEO of Tesla."
-            },
-            "rag_test": {
-                "description": "Ask a specific data question",
-                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'",
-                "example_payload": {"message": "What was Apple revenue in 2024?"},
-                "expected_response": "Apple's revenue in 2024 was ..."
-            },
-            "llm_test": {
-                "description": "Ask a general knowledge question",
-                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Explain machine learning\"}'",
-                "example_payload": {"message": "Explain machine learning"},
-                "expected_response": "Machine learning is a field of AI that ..."
-            }
-        }
+        "routing_system": {
+            "faq": "Simple factual questions (Who is the CEO of Tesla?)",
+            "rag": "Specific data queries (What was Apple's revenue?)",
+            "llm": "General knowledge (How does ML work?)"
+        },
+        "features": [
+            "🔄 Automatic intelligent routing",
+            "📊 Detailed response metadata",
+            "💬 Session-based conversations", 
+            "🚀 Interactive documentation",
+            "✅ Input validation & error handling"
+        ]
     }
 
 if __name__ == "__main__":

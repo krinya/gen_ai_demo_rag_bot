@@ -17,7 +17,7 @@ from pathlib import Path
 # Add project root to path for standalone execution
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
-from packages.chatbot.main import TemplateChatbot
+from packages.chatbot.main import MainChatbot
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +30,7 @@ def generate_graph_image():
         load_dotenv()
         
         # Create an actual chatbot instance to get the real workflow
-        chatbot = TemplateChatbot()
+        chatbot = MainChatbot()
         
         # Get the compiled workflow from the chatbot
         app = chatbot.app
