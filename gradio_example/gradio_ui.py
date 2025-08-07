@@ -37,9 +37,9 @@ def check_api_health() -> Tuple[bool, str]:
         if response.status_code == 200:
             return True, "✅ API is online and healthy"
         else:
-            return False, f"❌ API returned status {response.status_code}"
+            return False, f"❌ API returned status {response.status_code}. The free Render API may take up to 1 minute to start on the first request. Please wait 1 minute and try again."
     except requests.exceptions.RequestException as e:
-        return False, f"❌ Cannot connect to API: {str(e)}"
+        return False, f"❌ Cannot connect to API: {str(e)}. The free Render API may take up to 1 minute to start on the first request. Please wait 1 minute and try again."
 
 def send_message_to_api(message: str, session_id: str) -> Dict:
     """Send message to the chatbot API"""
@@ -280,7 +280,7 @@ def create_gradio_interface():
         **🚀 Deployment Info**: This prototype is powered by a FastAPI backend deployed on [Render](https://render.com), 
         showcasing full-stack AI development skills with production-ready architecture.
         
-        **🛠️ Tech Stack**: LangChain • OpenAI GPT-4o-mini • ChromaDB • FastAPI • Render Cloud • Gradio
+        **🛠️ Tech Stack**: LangChain • OpenAI GPT-4o-mini • ChromaDB • FastAPI • Render • Gradio
         """, elem_classes=["footer-info"])
         
         # Event handlers
@@ -308,7 +308,7 @@ def create_gradio_interface():
                 # Add user message and loading response immediately
                 loading_history = history + [
                     {"role": "user", "content": message},
-                    {"role": "assistant", "content": "🤔 Thinking..."}
+                    {"role": "assistant", "content": "🤔 Thinking... be patient, free servers are slow."}
                 ]
                 yield loading_history, "", "🔄 Processing your message...", session_id
                 
@@ -342,10 +342,10 @@ if __name__ == "__main__":
     # Launch with configuration
     interface.launch(
         server_name="127.0.0.1",  # Local access only
-        server_port=7861,  # Changed from 7860 to avoid conflicts
-        share=False,  # Set to True if you want a public link
+        server_port=7860,
+        share=False,
         debug=True,
         show_error=True,
         favicon_path=None,
-        auth=None  # Add authentication if needed
+        auth=None 
     )
