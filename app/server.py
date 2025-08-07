@@ -80,11 +80,29 @@ async def get_or_create_chatbot(session_id: str) -> TemplateChatbot:
 @app.post("/chat", response_model=ChatOutput)
 async def chat_endpoint(request: ChatInput):
     """
-    Enhanced chat endpoint with real routing metadata
+    Enhanced chat endpoint with real routing metadata.
+    
+    **How to use:**
+    - POST a JSON payload to `/chat` with your message.
+    - Optionally provide a `session_id` to continue a conversation.
+    
+    **Example payloads:**
+    ```json
+    {
+      "message": "Who is the CEO of Tesla?"
+    }
+    ```
+    ```json
+    {
+      "message": "What was Apple's revenue in 2024?"
+    }
+    ```
+    **Example curl:**
+    curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{"message": "Who is the CEO of Tesla?"}'
     
     **Routing Logic:**
     - FAQ: Simple factual questions (e.g., "Who is the CEO of Tesla?")
-    - RAG: Specific data queries (e.g., "What was Apple's revenue in 2024?") 
+    - RAG: Specific data queries (e.g., "What was Apple's revenue in 2024?")
     - LLM: General knowledge (e.g., "How does machine learning work?")
     """
     try:
@@ -193,11 +211,10 @@ async def health_check():
 
 @app.get("/")
 async def root():
-    """Enhanced API overview"""
+    """Enhanced API overview with instant test examples"""
     return {
         "message": "🚀 LangChain Chatbot API v1.1 - Enhanced",
         "description": "Advanced chatbot with real-time routing metadata",
-        
         "key_improvements": [
             "✅ Real routing metadata in responses",
             "✅ Input validation and error handling", 
@@ -205,18 +222,31 @@ async def root():
             "✅ Testing guide with examples",
             "✅ Enhanced documentation"
         ],
-        
         "endpoints": {
             "chat": "/chat - Main chat with routing metadata",
             "test": "/test - Testing guide with examples",
             "health": "/health - Health check with improvements",
             "docs": "/docs - Complete API documentation"
         },
-        
         "quick_test": {
-            "faq_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'",
-            "rag_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'",
-            "llm_test": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Explain machine learning\"}'"
+            "faq_test": {
+                "description": "Ask a simple factual question",
+                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Who is the CEO of Tesla?\"}'",
+                "example_payload": {"message": "Who is the CEO of Tesla?"},
+                "expected_response": "Elon Musk is the CEO of Tesla."
+            },
+            "rag_test": {
+                "description": "Ask a specific data question",
+                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"What was Apple revenue in 2024?\"}'",
+                "example_payload": {"message": "What was Apple revenue in 2024?"},
+                "expected_response": "Apple's revenue in 2024 was ..."
+            },
+            "llm_test": {
+                "description": "Ask a general knowledge question",
+                "curl": "curl -X POST 'http://localhost:8000/chat' -H 'Content-Type: application/json' -d '{\"message\": \"Explain machine learning\"}'",
+                "example_payload": {"message": "Explain machine learning"},
+                "expected_response": "Machine learning is a field of AI that ..."
+            }
         }
     }
 
