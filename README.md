@@ -1,6 +1,6 @@
 # AI Chatbot with Smart Routing & RAG
 
-A production-ready chatbot that intelligently routes questions using LangChain, LangGraph, and OpenAI. It decides whether to use FAQ knowledge, search documents via RAG, or call GPT-4o-mini based on your question.
+An example of a chatbot that intelligently routes questions. It decides whether to use FAQ knowledge, search documents via RAG, or call GPT-4o-mini based on your question.
 
 ## Features
 
@@ -13,10 +13,8 @@ A production-ready chatbot that intelligently routes questions using LangChain, 
 
 ## 🌐 Live Demo
 
-**Production API**: https://gen-ai-demo-rag-bot.onrender.com/
-
+**API**: https://gen-ai-demo-rag-bot.onrender.com/
 - **Documentation**: https://gen-ai-demo-rag-bot.onrender.com/docs  
-- **Health Check**: https://gen-ai-demo-rag-bot.onrender.com/health
 
 ### Quick API Test
 ```bash
@@ -24,7 +22,6 @@ A production-ready chatbot that intelligently routes questions using LangChain, 
 curl https://gen-ai-demo-rag-bot.onrender.com/health
 
 # Create session and chat
-curl -X POST https://gen-ai-demo-rag-bot.onrender.com/sessions
 curl -X POST https://gen-ai-demo-rag-bot.onrender.com/chat \
   -H "Content-Type: application/json" \
   -d '{"message": "Who is the CEO of Tesla?", "session_id": "YOUR_SESSION_ID"}'
@@ -63,7 +60,7 @@ Visit the [interactive docs](https://gen-ai-demo-rag-bot.onrender.com/docs) to t
 
 ## 🚀 Deployment
 
-**Live Production**: https://gen-ai-demo-rag-bot.onrender.com/
+**Live on**: https://gen-ai-demo-rag-bot.onrender.com/
 
 Ready to deploy to Render with Docker. Fork this repo, connect to Render, add your `OPENAI_API_KEY`, and deploy.
 
@@ -75,9 +72,6 @@ Ready to deploy to Render with Docker. Fork this repo, connect to Render, add yo
 | `/health` | GET | Health check |
 | `/docs` | GET | Interactive documentation |
 | `/chat` | POST | Send message |
-| `/sessions` | POST | Create session |
-| `/sessions/{id}/history` | GET | Get history |
-| `/sessions/{id}` | DELETE | Delete session |
 
 ## 📁 Project Structure
 
@@ -107,9 +101,8 @@ gen_ai_demo_rag_bot/
 ```python
 import requests
 
-# Create session and chat
-session = requests.post("https://gen-ai-demo-rag-bot.onrender.com/sessions")
-session_id = session.json()["session_id"]
+# Create session from you app and chat
+session_id = "your uuid from response"
 
 response = requests.post("https://gen-ai-demo-rag-bot.onrender.com/chat", 
     json={"message": "What can you tell me about Tesla?", "session_id": session_id})
