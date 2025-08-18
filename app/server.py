@@ -29,6 +29,7 @@ app = FastAPI(
     title="Chatbot with Intelligent Routing (FAQ / RAG / LLM) - API Demo",
     description="""
 AI Chatbot Demo with automatic routing and interactive API docs.
+You can try out the chatbot on this link too: [https://huggingface.co/spaces/krinya/smart_routing_with_render_example/](https://huggingface.co/spaces/krinya/smart_routing_with_render_example/)
 
 This service demonstrates a simple LangChain-powered chatbot that chooses the best backend for each question:
 - FAQ: short factual questions (e.g., "Who is the CEO of Tesla?")
@@ -36,8 +37,8 @@ This service demonstrates a simple LangChain-powered chatbot that chooses the be
 - LLM: general explanations and how-to questions (e.g., "How does machine learning work?")
 
 Notes:
-- The code is available on GitHub: https://github.com/krinya/gen_ai_demo_rag_bot
-- A demo UI is available on Hugging Face Spaces: https://huggingface.co/spaces/krinya/smart_rooting_on_render_example
+- The code is public on GitHub: [https://github.com/krinya/gen_ai_demo_rag_bot](https://github.com/krinya/gen_ai_demo_rag_bot)
+- A demo UI is available on Hugging Face Spaces: [https://huggingface.co/spaces/krinya/smart_routing_with_render_example/](https://huggingface.co/spaces/krinya/smart_routing_with_render_example/)
 - The demo focuses on questions about a set of companies (Tesla, Apple, Google, Amazon, Intel) to illustrate routing behavior.
 - Interactive documentation is available at /docs with ready-to-test examples for each routing type.
 
