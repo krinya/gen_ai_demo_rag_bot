@@ -26,24 +26,23 @@ except ImportError as e:
 
 # Create FastAPI app with enhanced documentation
 app = FastAPI(
-    title="Chatbot with inteligent routing (FAQ/ RAG / LLM) - API Demo",
-    description=f"""
-    AI Chatbot with Intelligent Routing for Demo
-    Code are available on GitHub: https://github.com/krinya/gen_ai_demo_rag_bot  
-    You can interact with the chatbot in the following UI too on Huggingface: https://huggingface.co/spaces/krinya/smart_rooting_on_render_example
-    
-    This API provides an example: 
-    - a chatbot that automatically routes questions to the most appropriate source. The use can ask questioos about 5 companies (Tesla, Apple, Google, Amazon, Intel) and the chatbot will decide whether to use:
-        - FAQ: Simple factual questions (CEO names, company info)
-        - RAG: Specific data queries (financial data, detailed company information)  
-        - LLM: General knowledge questions (explanations, how-to guides)  
-    - It uses LangChain
-    - It includes interactive API documentation with ready-to-test examples using FastAPI written in Python.
-    
-    Try it out directly in the docs below or in the following chat link!
-    
-    Each endpoint includes ready-to-test examples. Just click "Try it out" and modify the examples.
-    """,
+    title="Chatbot with Intelligent Routing (FAQ / RAG / LLM) - API Demo",
+    description="""
+AI Chatbot Demo with automatic routing and interactive API docs.
+
+This service demonstrates a simple LangChain-powered chatbot that chooses the best backend for each question:
+- FAQ: short factual questions (e.g., "Who is the CEO of Tesla?")
+- RAG: data-specific queries that rely on retrieval (e.g., "What was Apple's revenue in 2024?")
+- LLM: general explanations and how-to questions (e.g., "How does machine learning work?")
+
+Notes:
+- The code is available on GitHub: https://github.com/krinya/gen_ai_demo_rag_bot
+- A demo UI is available on Hugging Face Spaces: https://huggingface.co/spaces/krinya/smart_rooting_on_render_example
+- The demo focuses on questions about a set of companies (Tesla, Apple, Google, Amazon, Intel) to illustrate routing behavior.
+- Interactive documentation is available at /docs with ready-to-test examples for each routing type.
+
+Each endpoint includes example payloads you can run from the docs "Try it out" panel.
+""",
     version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
