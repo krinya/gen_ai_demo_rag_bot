@@ -26,18 +26,21 @@ except ImportError as e:
 
 # Create FastAPI app with enhanced documentation
 app = FastAPI(
-    title="🤖 Chatbot with inteligent routing (FAQ/ RAG / LLM) - Demo API",
+    title="Chatbot with inteligent routing (FAQ/ RAG / LLM) - API Demo",
     description=f"""
-    AI Demo Chatbot with Intelligent Routing
+    AI Chatbot with Intelligent Routing for Demo
+    Code are available on GitHub: https://github.com/krinya/gen_ai_demo_rag_bot  
+    You can interact with the chatbot in the following UI too on Huggingface: https://huggingface.co/spaces/krinya/smart_rooting_on_render_example
     
-    This API provides a chatbot that automatically routes questions to the most appropriate source:  
-    The use can ask questioos about 5 companies (Tesla, Apple, Google, Amazon, Intel) and the chatbot will decide whether to use:
+    This API provides an example: 
+    - a chatbot that automatically routes questions to the most appropriate source. The use can ask questioos about 5 companies (Tesla, Apple, Google, Amazon, Intel) and the chatbot will decide whether to use:
+        - FAQ: Simple factual questions (CEO names, company info)
+        - RAG: Specific data queries (financial data, detailed company information)  
+        - LLM: General knowledge questions (explanations, how-to guides)  
+    - It uses LangChain
+    - It includes interactive API documentation with ready-to-test examples using FastAPI written in Python.
     
-    - FAQ: Simple factual questions (CEO names, company info)
-    - RAG: Specific data queries (financial data, detailed company information)  
-    - LLM: General knowledge questions (explanations, how-to guides)
-    
-    Try it out directly in the docs below!
+    Try it out directly in the docs below or in the following chat link!
     
     Each endpoint includes ready-to-test examples. Just click "Try it out" and modify the examples.
     """,
