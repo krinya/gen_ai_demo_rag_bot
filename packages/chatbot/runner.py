@@ -68,7 +68,7 @@ class ChatbotCLI:
         print("📚 This chatbot can help you with:")
         print("   • FAQ questions (simple, direct questions)")
         print("   • RAG queries (complex questions using document knowledge)")
-        print("   • General knowledge (powered by GPT-4o-mini)")
+        print("   • General knowledge (powered by GPT-5-mini)")
         print()
         print("💬 Commands:")
         print("   • Type your question and press Enter")

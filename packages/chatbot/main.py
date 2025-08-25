@@ -78,8 +78,7 @@ class AnswerGrade(BaseModel):
 # Pydantic model for chatbot configuration
 class ChatbotConfig(BaseModel):
     """Configuration settings for the chatbot"""
-    model_name: str = Field(default="gpt-4o-mini", description="OpenAI model to use")
-    temperature: float = Field(default=0.3, ge=0.0, le=2.0, description="Model temperature")
+    model_name: str = Field(default="gpt-5-mini", description="OpenAI model to use")
     max_rephrase_attempts: int = Field(default=3, ge=1, le=10, description="Maximum rephrase attempts")
     embedding_model: str = Field(default="text-embedding-3-small", description="Embedding model for RAG")
     rag_documents_count: int = Field(default=5, ge=1, le=20, description="Number of documents to retrieve")
@@ -121,7 +120,7 @@ class MainChatbot:
         self._setup_langgraph()
         
         logger.info(f"Chatbot initialized with session ID: {self.session_id}")
-        logger.info(f"Configuration: model={self.config.model_name}, temp={self.config.temperature}, max_attempts={self.config.max_rephrase_attempts}")
+        logger.info(f"Configuration: model={self.config.model_name}, max_attempts={self.config.max_rephrase_attempts}")
     
     def _load_environment(self):
         """Load environment variables and configure LangSmith tracing"""
@@ -155,7 +154,6 @@ class MainChatbot:
         """Initialize the OpenAI language model"""
         self.llm = ChatOpenAI(
             model=self.config.model_name,
-            temperature=self.config.temperature,
             api_key=self.openai_api_key
         )
         logger.info(f"OpenAI LLM initialized: {self.config.model_name}")

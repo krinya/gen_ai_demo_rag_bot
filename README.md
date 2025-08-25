@@ -1,6 +1,6 @@
 # AI Chatbot with Smart Routing & RAG
 
-An example of a chatbot that intelligently routes questions. It decides whether to use FAQ knowledge, search documents via RAG, or call GPT-4o-mini based on your question.
+An example of a chatbot that intelligently routes questions. It decides whether to use FAQ knowledge, search documents via RAG, or call GPT-5-mini based on your question.
 
 ## Features
 
