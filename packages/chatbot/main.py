@@ -26,6 +26,7 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
 from langgraph.checkpoint.sqlite import SqliteSaver
 import asyncio
+from langgraph.checkpoint.memory import MemorySaver
 
 # Add project root to path for standalone execution
 import sys
@@ -250,9 +251,6 @@ class MainChatbot:
         workflow.add_edge("final_response", END)
         
         # Set up memory checkpointing for conversation memory
-        from langgraph.checkpoint.memory import MemorySaver
-        
-        # Use in-memory checkpointer (can be upgraded to persistent later)
         # This provides conversation memory within the session
         checkpointer = MemorySaver()
         

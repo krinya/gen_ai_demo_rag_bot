@@ -1,4 +1,4 @@
-# Dockerfile for LangChain CLI chatbot - Render optimized
+# Dockerfile for Demo chatbot for Render
 FROM python:3.12-slim
 
 WORKDIR /app
@@ -16,7 +16,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 # Copy project configuration and README (required by pyproject.toml)
 COPY pyproject.toml uv.lock README.md ./
 
-# Copy application code (new clean structure)
+# Copy application code
 COPY app/ ./app/
 COPY packages/ ./packages/
 

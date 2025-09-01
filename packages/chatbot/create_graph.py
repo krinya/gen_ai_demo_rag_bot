@@ -2,8 +2,7 @@
 LangGraph Visualization Script
 
 This script creates a visual representation of the chatbot's LangGraph workflow
-directly from the actual template_main.py implementation, ensuring the visualization
-matches the real workflow structure.
+directly from the actual template_main.py implementation, to see the real structure.
 """
 
 import os
